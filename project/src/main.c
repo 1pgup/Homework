@@ -4,10 +4,10 @@
 #include "is_prime.h"
 #include "utils.h"
 
-#define ERR_WRONG_INP  (2147483647)
 #define ERR_ARGS_COUNT     (-1)
 #define ERR_WRONG_FLG      (-2)
 #define ERR_WRONG_PTR      (-3)
+#define ERR_WRONG_INP      (-4)
 
 #define TST_FOO_FIX          1
 #define TST_FOO_IMPL         2
