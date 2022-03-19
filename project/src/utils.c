@@ -18,7 +18,7 @@ size_t timer_from(int from) {
 
 int custom_pow(int base, int power) {
     if (((base == 0) && (power == 0)) || (power < 0)) {
-        return 2147483647;
+        return ERR_RETURN;
     }
     int result = 1;
     for (int i = 1; i <= power; i++) {
