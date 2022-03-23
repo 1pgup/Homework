@@ -25,7 +25,7 @@ int main(int argc, const char** argv) {
     char *endptr = NULL;
     int test_case = (int) strtol(argv[1], &endptr, 10);
     if (*endptr != '\0') {
-        printf("Wrong value of pointer\n");
+        printf("Wrong value of endptr\n");
         return ERR_WRONG_PTR;
     }
 
