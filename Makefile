@@ -1,16 +1,15 @@
 TARGET = ./main.out
 HDRS_DIR = project/include
 
-# XXX: Don't forget backslash at the end of any line except the last one
 SRCS = \
-       project/src/main.c \
-       project/src/utils.c \
-	   project/src/is_prime.c \
-	   project/src/from_one_to_n.c
+		project/src/main.c\
+		project/src/utils.c\
+		project/src/prints.c\
+		project/src/test_module.c
 
-.PHONY: all build rebuild check test clean
+.PHONY: all build rebuild check test memtest clean
 
-all: clean check test
+all: clean check test memtest
 
 $(TARGET): $(SRCS)
 	$(CC) -Wpedantic -Wall -Wextra -Werror -I $(HDRS_DIR) -o $(TARGET) $(CFLAGS) $(SRCS)
@@ -25,5 +24,8 @@ check:
 test: $(TARGET)
 	./btests/run.sh $(TARGET)
 
+memtest: $(TARGET)
+	./btests/run.sh $(TARGET) --memcheck
+
 clean:
-	rm -rf $(TARGET)
+	rm -rf $(TARGET) *.dat
