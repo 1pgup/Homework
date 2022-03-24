@@ -20,7 +20,9 @@ int test_read_from_rec_file(FILE *file_ptr, Data_t inputed_data) {
         got_data.tel_number[i] = 0;
     }
 
-    read_from_rec_file(file_ptr, got_data);
+    if (read_from_rec_file(file_ptr, got_data) == ERROR_WRONG_VALUE_OF_INPUT_RETURN) {
+        return 0;
+    }
 
     if ((inputed_data.number == got_data.number)
       && (inputed_data.indebtedness == got_data.indebtedness)
@@ -55,7 +57,9 @@ int test_read_from_trans_file(FILE *file_ptr, Data_t inputed_data) {
         got_data.tel_number[i] = 0;
     }
 
-    read_from_trans_file(file_ptr, got_data);
+    if (read_from_trans_file(file_ptr, got_data) == ERROR_WRONG_VALUE_OF_INPUT_RETURN) {
+        return 0;
+    }
 
     if ((inputed_data.number == got_data.number) && (inputed_data.cash_payments == got_data.cash_payments)) {
         return 1;
@@ -63,18 +67,32 @@ int test_read_from_trans_file(FILE *file_ptr, Data_t inputed_data) {
     return 0;
 }
 
-void read_from_rec_file(FILE *file_ptr, Data_t got_data) {
-    fscanf(file_ptr, "%d%19s%19s%29s%14s%lf%lf%lf",
-                &got_data.number,
-                got_data.name,
-                got_data.surname,
-                got_data.address,
-                got_data.tel_number,
-                &got_data.indebtedness,
-                &got_data.credit_limit,
-                &got_data.cash_payments);
+int read_from_rec_file(FILE *file_ptr, Data_t got_data) {
+    int amount_of_assigned_values = 0;
+    while ((amount_of_assigned_values = fscanf(file_ptr, "%d%19s%19s%29s%14s%lf%lf%lf",
+                                                        &got_data.number,
+                                                        got_data.name,
+                                                        got_data.surname,
+                                                        got_data.address,
+                                                        got_data.tel_number,
+                                                        &got_data.indebtedness,
+                                                        &got_data.credit_limit,
+                                                        &got_data.cash_payments)) != -1) {
+        if (amount_of_assigned_values != 8) {
+            return ERROR_WRONG_VALUE_OF_INPUT_RETURN;
+        }
+    }
+    return 1;
 }
 
-void read_from_trans_file(FILE *file_ptr, Data_t got_data) {
-    fscanf(file_ptr, "%d%lf", &got_data.number, &got_data.cash_payments);
+int read_from_trans_file(FILE *file_ptr, Data_t got_data) {
+    int amount_of_assigned_values = 0;
+    while ((amount_of_assigned_values = fscanf(file_ptr, "%d%lf",
+                                                        &got_data.number,
+                                                        &got_data.cash_payments)) != -1) {
+         if (amount_of_assigned_values != 2) {
+            return ERROR_WRONG_VALUE_OF_INPUT_RETURN;
+        }
+    }
+    return 1;
 }

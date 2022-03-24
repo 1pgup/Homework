@@ -1,7 +1,7 @@
 #include "prints.h"
 
 void input_prompt() {
-    printf("%s", "please enter action\n1 enter data client:\n2 enter data transaction:\n3 update base\n");
+    printf("%s", "please enter action\n1 enter data client:\n2 enter data transaction:\n3 update base\n\n");
 }
 void input_prompt_client_inf() {
     printf("%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n\n",
@@ -15,7 +15,7 @@ void input_prompt_client_inf() {
                 "8 Client cash payments:");
 }
 void input_prompt_transfer_inf() {
-    printf("%s\n%s\n",
+    printf("%s\n%s\n\n",
                 "1 Number account:",
                 "2 Client cash payments: ");
 }

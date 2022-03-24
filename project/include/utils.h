@@ -7,7 +7,7 @@
 #define RECORD_FILE                        "record.dat"
 #define TRANSACTION_FILE                   "transaction.dat"
 
-#define ERROR_RETURN                            (-1)
+#define ERROR_WRONG_VALUE_OF_INPUT_RETURN      (-1)
 
 enum sizes {
     NameSize = 20,
