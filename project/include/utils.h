@@ -3,7 +3,7 @@
 
 #include "prints.h"
 
-#define CHANGING_OF_THE_CREDIT_LIMIT_FILE  "blackrecord.dat"
+#define CHANGING_OF_THE_CREDIT_LIMIT_FILE  "credit_limit_change.dat"
 #define RECORD_FILE                        "record.dat"
 #define TRANSACTION_FILE                   "transaction.dat"
 
