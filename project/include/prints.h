@@ -1,8 +1,6 @@
 #ifndef PROJECT_INCLUDE_PRINTS_H_
 #define PROJECT_INCLUDE_PRINTS_H_
 
-#include <stdio.h>
-
 void input_prompt();
 
 void input_prompt_client_inf();

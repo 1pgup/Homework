@@ -1,6 +1,10 @@
 #ifndef PROJECT_INCLUDE_UTILS_H_
 #define PROJECT_INCLUDE_UTILS_H_
 
+#include <stdio.h>
+
+#include "custom_types.h"
+#include "making_format_string.h"
 #include "prints.h"
 
 #define CHANGING_OF_THE_CREDIT_LIMIT_FILE  "credit_limit_change.dat"
@@ -8,27 +12,6 @@
 #define TRANSACTION_FILE                   "transaction.dat"
 
 #define ERROR_WRONG_VALUE_OF_INPUT_RETURN      (-1)
-
-enum sizes {
-    NameSize = 20,
-    SurnameSize = 20,
-    AddressSize = 30,
-    TelNumberSize = 15
-};
-
-struct masterRecord {
-    int number;
-
-    char name[NameSize];
-    char surname[SurnameSize];
-    char address[AddressSize];
-    char tel_number[TelNumberSize];
-
-    double indebtedness;
-    double credit_limit;
-    double cash_payments;
-};
-typedef struct masterRecord Data_t;
 
 int credit_limit_change(FILE *rec_ptr, FILE *trans_ptr, FILE *cr_lim_ch_ptr, Data_t client, Data_t transfer);
 

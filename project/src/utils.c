@@ -41,7 +41,7 @@ int client_inf_write(FILE *rec_ptr, Data_t client) {
                                                 client.tel_number,
                                                 &client.indebtedness,
                                                 &client.credit_limit,
-                                                &client.cash_payments)) != -1) {
+                                                &client.cash_payments))!= -1) {
         if (amount_of_assigned_values != 8) {
             return ERROR_WRONG_VALUE_OF_INPUT_RETURN;
         }

@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "test_module.h"
+#include "utils.h"
 
 #define CLIENT_DATA            1
 #define TRANSACTION_DATA       2
