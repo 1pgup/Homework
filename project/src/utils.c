@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "utils.h"
 
 size_t timer_from(int initial_number) {
@@ -19,7 +21,7 @@ size_t timer_from(int initial_number) {
 }
 
 int custom_pow(int base, int power) {
-    if (((base == 0) && (power == 0)) || (power < 0)) {
+    if (power < 0) {
         return ERR_WRONG_VALUES_INPUT_RETURN;
     }
 
@@ -30,4 +32,3 @@ int custom_pow(int base, int power) {
 
     return result;
 }
-

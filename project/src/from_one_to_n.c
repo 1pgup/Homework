@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 #include "from_one_to_n.h"
 
 void from_one_to_n(int number) {
