@@ -4,7 +4,7 @@
 #include <stddef.h>
 
 typedef struct Matrix {
-    size_t rows, collumns;
+    size_t rows, columns;
     size_t **ptr;
 } Matrix;
 
