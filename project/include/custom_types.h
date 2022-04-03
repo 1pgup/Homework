@@ -4,24 +4,23 @@
 #define FORMAT_STRING_MAX_SIZE   10
 
 enum sizes {
-    NameSize = 20,
-    SurnameSize = 20,
-    AddressSize = 30,
-    TelNumberSize = 15
+    NAMESIZE = 20,
+    SURNAMESIZE = 20,
+    ADDRESSSIZE = 30,
+    TELNUMBERSIZE = 15
 };
 
-struct masterRecord {
+typedef struct master_record {
     int number;
 
-    char name[NameSize];
-    char surname[SurnameSize];
-    char address[AddressSize];
-    char tel_number[TelNumberSize];
+    char name[NAMESIZE];
+    char surname[SURNAMESIZE];
+    char address[ADDRESSSIZE];
+    char tel_number[TELNUMBERSIZE];
 
     double indebtedness;
     double credit_limit;
     double cash_payments;
-};
-typedef struct masterRecord Data_t;
+} data_t;
 
 #endif  //  PROJECT_INCLUDE_CUSTOM_TYPES_H_
