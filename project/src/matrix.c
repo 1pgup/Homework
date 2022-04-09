@@ -263,7 +263,7 @@ Matrix* mul(const Matrix* l, const Matrix* r) {
     return mul_matrix;
 }
 
-// Extra operations
+// Extra operations (not done)
 int det(const Matrix* matrix, double* val) {
     if (!matrix || !val) {
         return ERROR_NULL_PTR;
@@ -271,7 +271,7 @@ int det(const Matrix* matrix, double* val) {
     return 0;
 }
 
-Matrix* adj(const Matrix* matrix) {
+Matrix* adj(const Matrix* matrix) {s
     if (!matrix) {
         return NULL;
     }
