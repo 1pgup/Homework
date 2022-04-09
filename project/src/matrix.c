@@ -271,7 +271,7 @@ int det(const Matrix* matrix, double* val) {
     return 0;
 }
 
-Matrix* adj(const Matrix* matrix) {s
+Matrix* adj(const Matrix* matrix) {
     if (!matrix) {
         return NULL;
     }
