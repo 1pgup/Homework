@@ -12,6 +12,9 @@ static Matrix* sec_sum(const Matrix* l, const Matrix* r) {
     }
 
     Matrix *sum_matrix = create_matrix(l->rows, l->columns);
+    if (!sum_matrix) {
+        return NULL;
+    }
 
     for (size_t i = 0; i <sum_matrix->rows; i++) {
         for (size_t j = 0; j < sum_matrix->columns; j++) {
@@ -28,6 +31,9 @@ static Matrix* sec_sub(const Matrix* l, const Matrix* r) {
     }
 
     Matrix *sub_matrix = create_matrix(l->rows, l->columns);
+    if (!sub_matrix) {
+        return NULL;
+    }
 
     for (size_t i = 0; i <sub_matrix->rows; i++) {
         for (size_t j = 0; j < sub_matrix->columns; j++) {
@@ -49,13 +55,13 @@ static Matrix* matrix_sum_or_sub(Matrix* (*foo)(const Matrix*, const Matrix*),
 }
 // Init/release operations
 Matrix* create_matrix_from_file(const char* path_file) {
-    if (path_file == NULL) {
+    if (!path_file) {
         return NULL;
     }
 
     FILE *fileptr = fopen(path_file, "r");
 
-    if (fileptr == NULL) {
+    if (!fileptr) {
         return NULL;
     }
 
@@ -172,6 +178,9 @@ Matrix* mul_scalar(const Matrix* matrix, double val) {
     }
 
     Matrix *mul_scalar = create_matrix(matrix->rows, matrix->columns);
+    if (!mul_scalar) {
+        return NULL;
+    }
 
     for (size_t i = 0; i < mul_scalar->rows; i++) {
         for (size_t j = 0; j < mul_scalar -> columns; j++) {
@@ -186,7 +195,11 @@ Matrix* transp(const Matrix* matrix) {
     if (!matrix) {
         return NULL;
     }
+
     Matrix *transposition = create_matrix(matrix->columns, matrix->rows);
+    if (!transposition) {
+        return NULL;
+    }
 
     for (size_t i = 0; i < matrix->rows; i++) {
         for (size_t j = 0; j < matrix->columns; j++) {
@@ -235,6 +248,9 @@ Matrix* mul(const Matrix* l, const Matrix* r) {
     }
 
     Matrix *mul_matrix = create_matrix(l->rows, r->columns);
+    if (!mul_matrix) {
+        return NULL;
+    }
 
     for (size_t i = 0; i < mul_matrix->rows; i++) {
         for (size_t j = 0; j < mul_matrix->columns; j++) {
