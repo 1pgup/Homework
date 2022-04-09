@@ -3,9 +3,11 @@
 
 #include <stddef.h>
 
+#define ERROR_NULL_PTR  (-1)
+
 typedef struct Matrix {
     size_t rows, columns;
-    size_t **ptr;
+    double **ptr;
 } Matrix;
 
 // Init/release operations
