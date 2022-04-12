@@ -37,7 +37,7 @@ int credit_limit_change(FILE *rec_ptr, FILE *trans_ptr, FILE *cr_lim_ch_ptr, dat
 }
 
 int client_inf_write(FILE *rec_ptr, data_t client) {
-    input_prompt_client_inf();
+    print_client_inf();
     int amount_of_assigned_values = 0;
     while ((amount_of_assigned_values = scanf("%d%19s%19s%29s%14s%lf%lf%lf",
                                                 &client.number,
@@ -54,13 +54,13 @@ int client_inf_write(FILE *rec_ptr, data_t client) {
         if (print_in_rec_file(rec_ptr, client)) {
             return ERROR_NULL_PTR;
         }
-        input_prompt_client_inf();
+        print_client_inf();
     }
     return 0;
 }
 
 int transaction_write(FILE *trans_ptr, data_t transfer) {
-    input_prompt_transfer_inf();
+    print_transfer_inf();
     int amount_of_assigned_values = 0;
     while ((amount_of_assigned_values = scanf("%d%lf", &transfer.number, &transfer.cash_payments)) != -1) {
         if (amount_of_assigned_values != 2) {
@@ -69,7 +69,7 @@ int transaction_write(FILE *trans_ptr, data_t transfer) {
         if (print_in_trans_file(trans_ptr, transfer)) {
             return ERROR_NULL_PTR;
         }
-        input_prompt_transfer_inf();
+        print_transfer_inf();
     }
     return 0;
 }

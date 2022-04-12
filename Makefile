@@ -2,17 +2,17 @@ TARGET = ./main.out
 TARGET_TEST = ./test.out
 HDRS_DIR = project/include
 
-SRCS =  project/src/main.c\
-        project/src/utils.c\
-        project/src/prints.c\
-		project/src/functions_for_cases.c
+SRCS = project/src/main.c\
+       project/src/utils.c\
+       project/src/prints.c\
+       project/src/functions_for_cases.c
 
 .PHONY: all build rebuild check build_my_test run_my_test test memtest clean
 
 SRCS_TEST = project/src/test_module.c\
-			project/src/functions_for_cases.c\
-			project/src/utils.c\
-			project/src/prints.c
+            project/src/functions_for_cases.c\
+            project/src/utils.c\
+            project/src/prints.c
 
 all: clean check test memtest
 

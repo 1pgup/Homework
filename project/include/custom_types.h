@@ -1,22 +1,23 @@
 #ifndef PROJECT_INCLUDE_CUSTOM_TYPES_H_
 #define PROJECT_INCLUDE_CUSTOM_TYPES_H_
 
-#define FORMAT_STRING_MAX_SIZE   10
+#define ERROR_WRONG_VALUE_OF_INPUT_RETURN      (-1)
+#define ERROR_NULL_PTR                         (-2)
 
 enum sizes {
-    NAMESIZE = 20,
-    SURNAMESIZE = 20,
-    ADDRESSSIZE = 30,
-    TELNUMBERSIZE = 15
+    NAME_SIZE = 20,
+    SURNAME_SIZE = 20,
+    ADDRESS_SIZE = 30,
+    TELNUMBER_SIZE = 15
 };
 
 typedef struct master_record {
     int number;
 
-    char name[NAMESIZE];
-    char surname[SURNAMESIZE];
-    char address[ADDRESSSIZE];
-    char tel_number[TELNUMBERSIZE];
+    char name[NAME_SIZE];
+    char surname[SURNAME_SIZE];
+    char address[ADDRESS_SIZE];
+    char tel_number[TELNUMBER_SIZE];
 
     double indebtedness;
     double credit_limit;

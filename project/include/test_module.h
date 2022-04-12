@@ -5,13 +5,13 @@
 
 #include "custom_types.h"
 
-#define ERROR_WRONG_VALUE_OF_INPUT_RETURN      (-1)
-#define ERROR_WRONG_VALUE_OF_PTR               (-2)
-#define ERROR_TEST_FAILED                      (-3)
-#define ERROR_DATA_MISMATCHES                  (-4)
+#define ERROR_WRONG_VALUE_OF_PTR               (-5)
+#define ERROR_TEST_FAILED                      (-6)
 
-int check_test_rec_or_cr_limit_change(FILE* test_ptr);
-int check_test_trans(FILE* test_ptr);
+#define EPS  1e-7
+
+int check_test_rec_or_cr_limit_change(char* filename);
+int check_test_trans(char* filename);
 int test_rec_or_cr_limit_change_file(FILE* test_ptr);
 int test_trans_file(FILE* test_ptr);
 
