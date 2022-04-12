@@ -18,6 +18,24 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         path: main.out
+  build_my_test:
+    runs-on: ubuntu-latest
+    container: leshiy1295/gcc_linters_valgrind
+    needs: [check]
+    steps:
+    - uses: actions/checkout@v2
+    - run: make build_my_test
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        path: test.out
+  run_my_test:
+    runs-on: ubuntu-latest
+    container: leshiy1295/gcc_linters_valgrind
+    needs: [build_my_test]
+    steps:
+      - uses: actions/checkout@v2
+      - run: make run_my_test
   test:
     runs-on: ubuntu-latest
     container: leshiy1295/gcc_linters_valgrind
