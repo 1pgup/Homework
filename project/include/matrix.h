@@ -6,6 +6,14 @@
 namespace prep {
 class Matrix {
  public:
+  double **ptr;
+
+  size_t rows;
+  size_t cols;
+
+  Matrix() : ptr{ NULL }, rows{ 0 }, cols{ 0 } {}
+
+ public:
   explicit Matrix(size_t rows = 0, size_t cols = 0);
   explicit Matrix(std::istream& is);
   Matrix(const Matrix& rhs) = default;
