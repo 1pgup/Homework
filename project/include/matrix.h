@@ -3,8 +3,8 @@
 
 #include <stddef.h>
 
-#define ERROR_NULL_PTR                     (-1)
-#define ERROR_TOO_MUCH_VALUE_OF_ROW_OR_COL (-2)
+#define ERROR_NULL_PTR                      (-1)
+#define ERROR_TOO_MUCH_VALUE_OF_ROW_OR_COL  (-2)
 
 typedef struct Matrix {
     size_t rows, columns;

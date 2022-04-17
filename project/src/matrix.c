@@ -3,47 +3,7 @@
 
 #include "matrix.h"
 
-static Matrix* (*foo)(const Matrix*, const Matrix*);
-
-// Secondary functions
-static Matrix* sec_sum(const Matrix* l, const Matrix* r) {
-    if (!l || !r) {
-        return NULL;
-    }
-
-    Matrix *sum_matrix = create_matrix(l->rows, l->columns);
-    if (!sum_matrix) {
-        return NULL;
-    }
-
-    for (size_t i = 0; i <sum_matrix->rows; i++) {
-        for (size_t j = 0; j < sum_matrix->columns; j++) {
-            sum_matrix->element[i][j] = l->element[i][j] + r->element[i][j];
-        }
-    }
-
-    return sum_matrix;
-}
-
-static Matrix* sec_sub(const Matrix* l, const Matrix* r) {
-    if (!l || !r) {
-        return NULL;
-    }
-
-    Matrix *sub_matrix = create_matrix(l->rows, l->columns);
-    if (!sub_matrix) {
-        return NULL;
-    }
-
-    for (size_t i = 0; i <sub_matrix->rows; i++) {
-        for (size_t j = 0; j < sub_matrix->columns; j++) {
-            sub_matrix->element[i][j] = l->element[i][j] - r->element[i][j];
-        }
-    }
-
-    return sub_matrix;
-}
-
+// Secondary function
 static Matrix* matrix_sum_or_sub(Matrix* (*foo)(const Matrix*, const Matrix*),
                                 const Matrix* l,
                                 const Matrix* r) {
@@ -51,7 +11,30 @@ static Matrix* matrix_sum_or_sub(Matrix* (*foo)(const Matrix*, const Matrix*),
         return NULL;
     }
 
-    return foo(l , r);
+    Matrix *sub_or_sum_matrix = create_matrix(l->rows, l->columns);
+    if (!sub_or_sum_matrix) {
+        return NULL;
+    }
+
+    if (foo == sum) {
+        for (size_t i = 0; i <sub_or_sum_matrix->rows; i++) {
+            for (size_t j = 0; j < sub_or_sum_matrix->columns; j++) {
+                sub_or_sum_matrix->element[i][j] = l->element[i][j] + r->element[i][j];
+            }
+        }
+        return sub_or_sum_matrix;
+    }
+
+    if (foo == sub) {
+        for (size_t i = 0; i <sub_or_sum_matrix->rows; i++) {
+            for (size_t j = 0; j < sub_or_sum_matrix->columns; j++) {
+                sub_or_sum_matrix->element[i][j] = l->element[i][j] - r->element[i][j];
+            }
+        }
+        return sub_or_sum_matrix;
+    }
+
+    return NULL;
 }
 // Init/release operations
 Matrix* create_matrix_from_file(const char* path_file) {
@@ -72,11 +55,11 @@ Matrix* create_matrix_from_file(const char* path_file) {
         return NULL;
     }
 
-    int amount_of_asigned_values = 0;
+    int amount_of_assigned_values = 0;
     int rows = 0;
     int cols = 0;
-    while ((amount_of_asigned_values = fscanf(fileptr, "%d%d", &rows, &cols)) != -1) {
-        if (amount_of_asigned_values == 2) {
+    while ((amount_of_assigned_values = fscanf(fileptr, "%d%d", &rows, &cols)) != -1) {
+        if (amount_of_assigned_values == 2) {
             break;
         }
         fclose(fileptr);
@@ -97,6 +80,9 @@ Matrix* create_matrix_from_file(const char* path_file) {
 
     for (size_t i = 0; i < matrix->rows; i++) {
         if (!(matrix->element[i] = malloc(sizeof(double)*matrix->columns))) {
+            for (size_t j = 0; j <= i; j++) {
+                free(matrix->element[j]);
+            }
             free(matrix->element);
             free(matrix);
             fclose(fileptr);
@@ -106,7 +92,14 @@ Matrix* create_matrix_from_file(const char* path_file) {
 
     for (size_t i = 0; i < matrix->rows; i++) {
         for (size_t j = 0; j < matrix -> columns; j++) {
-            fscanf(fileptr, "%lf", &matrix->element[i][j]);
+            while ((amount_of_assigned_values = fscanf(fileptr, "%lf", &matrix->element[i][j])) != -1) {
+                if (amount_of_assigned_values == 1) {
+                    break;
+                }
+                free_matrix(matrix);
+                fclose(fileptr);
+                return NULL;
+            }
         }
     }
 
@@ -133,6 +126,9 @@ Matrix* create_matrix(size_t rows, size_t cols) {
 
     for (size_t i = 0; i < matrix->rows; i++) {
         if (!(matrix->element[i] = malloc(sizeof(double)*matrix->columns))) {
+            for (size_t j = 0; j <= i; j++) {
+                free(matrix->element[j]);
+            }
             free(matrix->element);
             free(matrix);
             return NULL;
@@ -245,9 +241,7 @@ Matrix* sum(const Matrix* l, const Matrix* r) {
         return NULL;
     }
 
-    foo = &sec_sum;
-
-    return matrix_sum_or_sub(*foo, l, r);
+    return matrix_sum_or_sub(sum, l, r);
 }
 
 Matrix* sub(const Matrix* l, const Matrix* r) {
@@ -259,9 +253,7 @@ Matrix* sub(const Matrix* l, const Matrix* r) {
         return NULL;
     }
 
-    foo = &sec_sub;
-
-    return matrix_sum_or_sub(*foo, l, r);
+    return matrix_sum_or_sub(sub, l, r);
 }
 
 Matrix* mul(const Matrix* l, const Matrix* r) {
