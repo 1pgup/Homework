@@ -18,7 +18,7 @@ static Matrix* sec_sum(const Matrix* l, const Matrix* r) {
 
     for (size_t i = 0; i <sum_matrix->rows; i++) {
         for (size_t j = 0; j < sum_matrix->columns; j++) {
-            sum_matrix->ptr[i][j] = l->ptr[i][j] + r->ptr[i][j];
+            sum_matrix->element[i][j] = l->element[i][j] + r->element[i][j];
         }
     }
 
@@ -37,7 +37,7 @@ static Matrix* sec_sub(const Matrix* l, const Matrix* r) {
 
     for (size_t i = 0; i <sub_matrix->rows; i++) {
         for (size_t j = 0; j < sub_matrix->columns; j++) {
-            sub_matrix->ptr[i][j] = l->ptr[i][j] - r->ptr[i][j];
+            sub_matrix->element[i][j] = l->element[i][j] - r->element[i][j];
         }
     }
 
@@ -72,13 +72,32 @@ Matrix* create_matrix_from_file(const char* path_file) {
         return NULL;
     }
 
-    fscanf(fileptr, "%zu%zu", &matrix->rows, &matrix->columns);
+    int amount_of_asigned_values = 0;
+    int rows = 0;
+    int cols = 0;
+    while ((amount_of_asigned_values = fscanf(fileptr, "%d%d", &rows, &cols)) != -1) {
+        if (amount_of_asigned_values == 2) {
+            break;
+        }
+        fclose(fileptr);
+        free(matrix);
+        return NULL;
+    }
 
-    matrix->ptr = malloc(sizeof(double*)*matrix->rows);
+    if ((rows < 0) || (cols < 0)) {
+        fclose(fileptr);
+        free(matrix);
+        return NULL;
+    }
+
+    matrix->rows = rows;
+    matrix->columns = cols;
+
+    matrix->element = malloc(sizeof(double*)*matrix->rows);
 
     for (size_t i = 0; i < matrix->rows; i++) {
-        if (!(matrix->ptr[i] = malloc(sizeof(double)*matrix->columns))) {
-            free(matrix->ptr);
+        if (!(matrix->element[i] = malloc(sizeof(double)*matrix->columns))) {
+            free(matrix->element);
             free(matrix);
             fclose(fileptr);
             return NULL;
@@ -87,7 +106,7 @@ Matrix* create_matrix_from_file(const char* path_file) {
 
     for (size_t i = 0; i < matrix->rows; i++) {
         for (size_t j = 0; j < matrix -> columns; j++) {
-            fscanf(fileptr, "%lf", &matrix->ptr[i][j]);
+            fscanf(fileptr, "%lf", &matrix->element[i][j]);
         }
     }
 
@@ -105,16 +124,16 @@ Matrix* create_matrix(size_t rows, size_t cols) {
     matrix->rows = rows;
     matrix->columns = cols;
 
-    matrix->ptr = malloc(sizeof(double*)*matrix->rows);
+    matrix->element = malloc(sizeof(double*)*matrix->rows);
 
-    if (!matrix->ptr) {
+    if (!matrix->element) {
         free(matrix);
         return NULL;
     }
 
     for (size_t i = 0; i < matrix->rows; i++) {
-        if (!(matrix->ptr[i] = malloc(sizeof(double)*matrix->columns))) {
-            free(matrix->ptr);
+        if (!(matrix->element[i] = malloc(sizeof(double)*matrix->columns))) {
+            free(matrix->element);
             free(matrix);
             return NULL;
         }
@@ -129,9 +148,9 @@ void free_matrix(Matrix* matrix) {
     }
 
     for (size_t i = 0; i < matrix->rows; i++) {
-        free(matrix->ptr[i]);
+        free(matrix->element[i]);
     }
-    free(matrix->ptr);
+    free(matrix->element);
     free(matrix);
 }
 
@@ -158,7 +177,11 @@ int get_elem(const Matrix* matrix, size_t row, size_t col, double* val) {
         return ERROR_NULL_PTR;
     }
 
-    *val = matrix->ptr[row][col];
+    if ((row > matrix->rows) || (col > matrix->columns)) {
+        return ERROR_TOO_MUCH_VALUE_OF_ROW_OR_COL;
+    }
+
+    *val = matrix->element[row][col];
     return 0;
 }
 
@@ -166,8 +189,11 @@ int set_elem(Matrix* matrix, size_t row, size_t col, double val) {
     if (!matrix) {
         return ERROR_NULL_PTR;
     }
+    if ((row > matrix->rows) || (col > matrix->columns)) {
+        return ERROR_TOO_MUCH_VALUE_OF_ROW_OR_COL;
+    }
 
-    matrix->ptr[row][col] = val;
+    matrix->element[row][col] = val;
     return 0;
 }
 
@@ -184,7 +210,7 @@ Matrix* mul_scalar(const Matrix* matrix, double val) {
 
     for (size_t i = 0; i < mul_scalar->rows; i++) {
         for (size_t j = 0; j < mul_scalar -> columns; j++) {
-            mul_scalar->ptr[i][j] = matrix->ptr[i][j] * val;
+            mul_scalar->element[i][j] = matrix->element[i][j] * val;
         }
     }
 
@@ -203,7 +229,7 @@ Matrix* transp(const Matrix* matrix) {
 
     for (size_t i = 0; i < matrix->rows; i++) {
         for (size_t j = 0; j < matrix->columns; j++) {
-            transposition->ptr[j][i] = matrix->ptr[i][j];
+            transposition->element[j][i] = matrix->element[i][j];
         }
     }
 
@@ -254,9 +280,9 @@ Matrix* mul(const Matrix* l, const Matrix* r) {
 
     for (size_t i = 0; i < mul_matrix->rows; i++) {
         for (size_t j = 0; j < mul_matrix->columns; j++) {
-            mul_matrix->ptr[i][j] = 0;
+            mul_matrix->element[i][j] = 0;
             for (size_t k = 0; k < l->columns; k++) {
-                mul_matrix->ptr[i][j] += l->ptr[i][k] * r->ptr[k][j];
+                mul_matrix->element[i][j] += l->element[i][k] * r->element[k][j];
             }
         }
     }
