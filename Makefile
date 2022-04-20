@@ -1,8 +1,12 @@
 TARGET = ./main.out
 VALGRIND_LOG = "valgrind.log"
 
+HDRS = \
+	   project/include
+
 SRCS = \
 	   project/src/main.c \
+	   project/src/cjson.c
 
 .PHONY: all check build test memtest rebuild clean
 
