@@ -5,20 +5,17 @@
 
 namespace prep {
 class Matrix {
- public:
-  double **ptr;
+ private:
+  double *element{ 0 };
 
-  size_t rows;
-  size_t cols;
-
-  Matrix() : ptr{ NULL }, rows{ 0 }, cols{ 0 } {}
+  size_t rows{ 0 };
+  size_t cols{ 0 };
 
  public:
   explicit Matrix(size_t rows = 0, size_t cols = 0);
   explicit Matrix(std::istream& is);
-  Matrix(const Matrix& rhs) = default;
-  Matrix& operator=(const Matrix& rhs) = default;
-  ~Matrix() = default;
+  Matrix(const Matrix& rhs);
+  ~Matrix();
 
   size_t getRows() const;
   size_t getCols() const;
@@ -28,6 +25,8 @@ class Matrix {
 
   bool operator==(const Matrix& rhs) const;
   bool operator!=(const Matrix& rhs) const;
+
+  Matrix& operator=(const Matrix& rhs);
 
   Matrix operator+(const Matrix& rhs) const;
   Matrix operator-(const Matrix& rhs) const;
@@ -44,6 +43,11 @@ class Matrix {
   double det() const;
   Matrix adj() const;
   Matrix inv() const;
+
+ private:
+  double findDet(const Matrix& matrix, size_t n) const;
+
+  void sumOrSub(int key, const Matrix& matrixSumOrSub, const Matrix& rhs) const;
 };
 
 Matrix operator*(double val, const Matrix& matrix);
