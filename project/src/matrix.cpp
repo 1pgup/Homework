@@ -47,7 +47,7 @@ namespace prep {
                     }
 	    		}
 	    	}
-	    	det += pow(-1, k + 2) * matrix(0, k) * findDet(newMatrix, n - 1);
+	    	det += pow(-1.0, k + 2) * matrix(0, k) * findDet(newMatrix, n - 1);
 	    }
 	    return det;
     }
@@ -172,7 +172,7 @@ namespace prep {
 	    for (size_t i = 0; i < rhs.getRows(); i++) {
 	    	for (size_t j = 0; j < rhs.getCols(); j++) {
 	    	    if (std::abs(*(this->element + i * this->getCols() + j) - rhs(i, j))
-                    >= std::numeric_limits<double>::epsilon()) {
+                    >= 1e-7) {
 	    	    	return false;
 	    	    }
 	    	}
@@ -188,7 +188,7 @@ namespace prep {
         for (size_t i = 0; i < rhs.getRows(); i++) {
 	    	for (size_t j = 0; j < rhs.getCols(); j++) {
 	    	    if (std::abs(*(this->element + i * this->getCols() + j) - rhs(i, j))
-                    >= std::numeric_limits<double>::epsilon()) {
+                    >= 1e-7) {
 	    	    	return true;
 	    	    }
 	    	}
@@ -202,7 +202,7 @@ namespace prep {
 
         for (size_t i = 0; i < matrix.getRows(); i++) {
 			for (size_t j = 0; j < matrix.getCols(); j++) {
-                os << std::setprecision(std::numeric_limits<double>::max_digits10)
+                os << std::setprecision(std::numeric_limits<double>::max_digits10) << std::fixed
                    << matrix(i, j)
                    <<  " ";
             }
@@ -335,7 +335,7 @@ namespace prep {
 
 	    for (size_t i = 0; i < this->getCols(); i++) {
 	    	for (size_t j = 0; j < this->getCols(); j++) {
-	    		adjMatrix(i, j) = pow(-1, i + j) * deleteRowAndColFromMatrix(*this, i, j).det();
+	    		adjMatrix(i, j) = pow(-1.0, i + j) * deleteRowAndColFromMatrix(*this, i, j).det();
 	    	}
 	    }
 	    return adjMatrix.transp();
@@ -351,6 +351,6 @@ namespace prep {
             throw SingularMatrix();
         }
 
-        return this->adj() * (1 / this->det());;
+        return this->adj() * (1.0 / this->det());;
     }
 }  // namespace prep
