@@ -19,6 +19,18 @@ class MatrixException: public std::exception {
   std::string m_msg;
 };
 
+class CouldNotAllocateMemory: public MatrixException {
+ public:
+  CouldNotAllocateMemory()
+      : MatrixException("Could not allocate memory") {}
+};
+
+class UnknownFunction: public MatrixException {
+ public:
+  UnknownFunction()
+      : MatrixException("Error, wrong function passed") {}
+};
+
 class InvalidMatrixStream: public MatrixException {
  public:
   InvalidMatrixStream()

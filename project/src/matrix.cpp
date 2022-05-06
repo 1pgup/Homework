@@ -7,123 +7,23 @@
 #include "exceptions.h"
 
 namespace prep {
-    // Secondary functions
-    static Matrix deleteRowAndColFromMatrix(const Matrix& matrix, size_t indRow, size_t indCol) {
-        Matrix temp_matrix(matrix.getRows() - 1, matrix.getCols() - 1);
-
-        size_t ki = 0;
-
-    	for (size_t i = 0; i < matrix.getCols(); i++) {
-    		if (i != indRow) {
-    			for (size_t j = 0, kj = 0; j < matrix.getCols(); j++) {
-    				if (j != indCol) {
-    					temp_matrix(ki, kj) = matrix(i, j);
-    					kj++;
-    				}
-    			}
-    			ki++;
-    		}
-    	}
-        return temp_matrix;
-    }
-
-    double Matrix::findDet(const Matrix& matrix, size_t n) const {
-	    if (n == 1) {
-	    	return matrix(0, 0);
-	    }
-	    if (n == 2) {
-	    	return matrix(0, 0) * matrix(1, 1) - matrix(0, 1) * matrix(1, 0);
-	    }
-
-	    double det = 0;
-	    for (size_t k = 0; k < n; k++) {
-	    	Matrix newMatrix(n - 1, n - 1);
-	    	for (size_t i = 1; i < n; i++) {
-	    		size_t t = 0;
-	    		for (size_t j = 0; j < n; j++) {
-	    			if (j != k) {
-	    				newMatrix(i - 1, t) = matrix(i, j);
-	    			    t++;
-                    }
-	    		}
-	    	}
-	    	det += pow(-1.0, k + 2) * matrix(0, k) * findDet(newMatrix, n - 1);
-	    }
-	    return det;
-    }
-
-    void Matrix::sumOrSub(int key, const Matrix& matrixSumOrSub, const Matrix& rhs) const {
-        if (key == 1) {
-            for (size_t i = 0; i < this->getRows(); i++) {
-		        for (size_t j = 0; j < this->getCols(); j++) {
-			        *(matrixSumOrSub.element +i * matrixSumOrSub.getCols() + j) = *(this->element + i * this->getCols()
-                                                                                  + j) + rhs(i, j);
-		        }
-	        }
-        }
-        if (key == 2) {
-            for (size_t i = 0; i < this->getRows(); i++) {
-		        for (size_t j = 0; j < this->getCols(); j++) {
-			        *(matrixSumOrSub.element +i * matrixSumOrSub.getCols() + j) = *(this->element + i * this->getCols()
-                                                                                  + j) - rhs(i, j);
-		        }
-	        }
-        }
-        if (key != 2 && key != 1) {
-            throw;
-        }
-    }
-
-    // Destructor
-    Matrix::~Matrix() {
-        delete[] element;
-    }
-
     // Constructors
-    Matrix:: Matrix(const Matrix& rhs) {
-        this->cols = rhs.cols;
-		this->rows = rhs.rows;
-
-		element = new double[rhs.getRows() * rhs.getCols()];
-        if (element == 0x0) {
-            throw;
-        }
-
-		for (size_t i = 0; i < this->rows; i++) {
-			for (size_t j = 0; j < this->cols; j++) {
-				*(element + i * this->cols + j) = rhs(i, j);
-			}
-		}
-    }
-
-    Matrix:: Matrix(size_t rows, size_t cols) {
-        this->rows = rows;
-        this->cols = cols;
-
+    Matrix:: Matrix(size_t rows, size_t cols): rows(rows), cols(cols) {
         element = new double[this->rows * this->cols];
-        if (element == 0x0) {
-            throw;
+        if (element == nullptr) {
+            throw CouldNotAllocateMemory();
         }
     }
 
     Matrix:: Matrix(std::istream& is) {
-        int testRows = 0;
-        int testCols = 0;
-
-        is >> testRows >> testCols;
+        is >> this->rows >> this->cols;
         if (is.fail()) {
             throw InvalidMatrixStream();
         }
-        if (testRows < 0 || testCols < 0) {
-            throw;
-        }
-
-        this->rows = testRows;
-        this->cols = testCols;
 
         this->element = new double[this->rows * this->cols];
-        if (element == 0x0) {
-            throw;
+        if (element == nullptr) {
+            throw CouldNotAllocateMemory();
         }
 
         for (size_t i = 0; i < this->rows; i++) {
@@ -135,6 +35,27 @@ namespace prep {
                 }
             }
         }
+    }
+
+    Matrix:: Matrix(const Matrix& rhs) {
+        this->cols = rhs.getCols();
+        this->rows = rhs.getRows();
+
+        element = new double[rhs.getRows() * rhs.getCols()];
+        if (element == nullptr) {
+            throw CouldNotAllocateMemory();
+        }
+
+        for (size_t i = 0; i < this->rows; i++) {
+            for (size_t j = 0; j < this->cols; j++) {
+                *(element + i * this->cols + j) = rhs(i, j);
+            }
+        }
+    }
+
+    // Destructor
+    Matrix::~Matrix() {
+        delete[] element;
     }
 
     // Getting size of matrix
@@ -166,72 +87,86 @@ namespace prep {
     // Comparison
     bool Matrix::operator==(const Matrix& rhs) const {
         if (this->getRows() != rhs.getRows() || this->getCols() != rhs.getCols()) {
-		    return false;
-	    }
+            return false;
+        }
 
-	    for (size_t i = 0; i < rhs.getRows(); i++) {
-	    	for (size_t j = 0; j < rhs.getCols(); j++) {
-	    	    if (std::abs(*(this->element + i * this->getCols() + j) - rhs(i, j))
+        for (size_t i = 0; i < rhs.getRows(); i++) {
+            for (size_t j = 0; j < rhs.getCols(); j++) {
+                if (std::abs(*(this->element + i * this->getCols() + j) - rhs(i, j))
                     >= 1e-7) {
-	    	    	return false;
-	    	    }
-	    	}
-	    }
+                    return false;
+                }
+            }
+        }
         return true;
     }
 
     bool Matrix::operator!=(const Matrix& rhs) const {
         if (this->getRows() != rhs.getRows() || this->getCols() != rhs.getCols()) {
-		    return true;
-	    }
+            return true;
+        }
 
         for (size_t i = 0; i < rhs.getRows(); i++) {
-	    	for (size_t j = 0; j < rhs.getCols(); j++) {
-	    	    if (std::abs(*(this->element + i * this->getCols() + j) - rhs(i, j))
+            for (size_t j = 0; j < rhs.getCols(); j++) {
+                if (std::abs(*(this->element + i * this->getCols() + j) - rhs(i, j))
                     >= 1e-7) {
-	    	    	return true;
-	    	    }
-	    	}
-	    }
-        return false;
-    }
-
-    // Printing matrix
-    std::ostream& operator<<(std::ostream& os, const Matrix& matrix) {
-        os << matrix.rows << ' ' << matrix.getCols() << std::endl;
-
-        for (size_t i = 0; i < matrix.getRows(); i++) {
-			for (size_t j = 0; j < matrix.getCols(); j++) {
-                os << std::setprecision(std::numeric_limits<double>::max_digits10) << std::fixed
-                   << matrix(i, j)
-                   <<  " ";
+                    return true;
+                }
             }
-            os << std::endl;
         }
-        os << std::endl;
-        return os;
+        return false;
     }
 
     // Matrix equation
     Matrix& Matrix::operator=(const Matrix& rhs) {
-        if (this != &rhs) {
-			delete[] element;
+        if (this == &rhs) {
+            return *this;
+        }
 
-            this->rows = rhs.getRows();
-            this->cols = rhs.getCols();
+        delete[] element;
 
-			element = new double[rhs.getRows() * rhs.getCols()];
+        this->rows = rhs.getRows();
+        this->cols = rhs.getCols();
 
-            if (element == 0x0) {
-                throw;
+        element = new double[rhs.getRows() * rhs.getCols()];
+        if (element == nullptr) {
+            throw CouldNotAllocateMemory();
+        }
+
+        for (size_t i = 0; i < this->rows; i++) {
+            for (size_t j = 0; j < this->cols; j++) {
+                *(element + i * this->cols + j) = rhs(i, j);
             }
-			for (size_t i = 0; i < this->rows; i++) {
-				for (size_t j = 0; j < this->cols; j++) {
-					*(element + i * this->cols + j) = rhs(i, j);
-				}
-			}
-		}
-		return *this;
+        }
+        return *this;
+    }
+
+    // Secondary functions for sum and sub opearators
+    void sum(const Matrix& matrixSumOrSub, const Matrix& rhs) {
+        for (size_t i = 0; i < matrixSumOrSub.getRows(); i++) {
+            for (size_t j = 0; j < matrixSumOrSub.getCols(); j++) {
+                *(matrixSumOrSub.element +i * matrixSumOrSub.getCols() + j) = *(matrixSumOrSub.element
+                                                        + i * matrixSumOrSub.getCols()+ j) + rhs(i, j);
+            }
+        }
+    }
+
+    void sub(const Matrix& matrixSumOrSub, const Matrix& rhs) {
+        for (size_t i = 0; i < matrixSumOrSub.getRows(); i++) {
+            for (size_t j = 0; j < matrixSumOrSub.getCols(); j++) {
+                *(matrixSumOrSub.element +i * matrixSumOrSub.getCols() + j) = *(matrixSumOrSub.element
+                                                        + i * matrixSumOrSub.getCols() + j) - rhs(i, j);
+            }
+        }
+    }
+
+    void sumOrSub(void (*foo)(const Matrix&, const Matrix&),
+                const Matrix& matrixSumOrSub,
+                const Matrix& rhs) {
+        if (foo != sum && foo != sub) {
+            throw UnknownFunction();
+        }
+        foo(matrixSumOrSub, rhs);
     }
 
     // Summary
@@ -242,7 +177,7 @@ namespace prep {
 
         Matrix matrixSum(*this);
 
-        sumOrSub(1, matrixSum, rhs);
+        sumOrSub(sum, matrixSum, rhs);
         return matrixSum;
     }
 
@@ -254,8 +189,8 @@ namespace prep {
 
         Matrix matrixSub(*this);
 
-        sumOrSub(2, matrixSub, rhs);
-	    return matrixSub;
+        sumOrSub(sub, matrixSub, rhs);
+        return matrixSub;
     }
 
     // Matrix multiplication
@@ -303,6 +238,22 @@ namespace prep {
         return mulScalar;
     }
 
+    // Printing matrix
+    std::ostream& operator<<(std::ostream& os, const Matrix& matrix) {
+        os << matrix.rows << ' ' << matrix.getCols() << std::endl;
+
+        for (size_t i = 0; i < matrix.getRows(); i++) {
+            for (size_t j = 0; j < matrix.getCols(); j++) {
+                os << std::setprecision(std::numeric_limits<double>::max_digits10) << std::fixed
+                   << matrix(i, j)
+                   <<  " ";
+            }
+            os << std::endl;
+        }
+        os << std::endl;
+        return os;
+    }
+
     // Transposition
     Matrix Matrix::transp() const {
         Matrix transposition(this->getCols(), this->getRows());
@@ -319,38 +270,83 @@ namespace prep {
     // Determinant
     double Matrix::det() const {
         if (this->getCols() != this->getRows()) {
-		    throw DimensionMismatch(*this);
-	    }
+            throw DimensionMismatch(*this);
+        }
 
-	    return findDet(*this, this->getCols());
+        return findDet(*this, this->getCols());
     }
 
     // Adjacency matrix
     Matrix Matrix::adj() const {
         if (this->getCols() != this->getRows()) {
-		    throw DimensionMismatch(*this);
-	    }
+            throw DimensionMismatch(*this);
+        }
 
-	    Matrix adjMatrix(*this);
+        Matrix adjMatrix(*this);
 
-	    for (size_t i = 0; i < this->getCols(); i++) {
-	    	for (size_t j = 0; j < this->getCols(); j++) {
-	    		adjMatrix(i, j) = pow(-1.0, i + j) * deleteRowAndColFromMatrix(*this, i, j).det();
-	    	}
-	    }
-	    return adjMatrix.transp();
+        for (size_t i = 0; i < this->getCols(); i++) {
+            for (size_t j = 0; j < this->getCols(); j++) {
+                adjMatrix(i, j) = pow(-1.0, i + j) * deleteRowAndColFromMatrix(*this, i, j).det();
+            }
+        }
+        return adjMatrix.transp();
     }
 
     // Inversion matrix
     Matrix Matrix::inv() const {
         if (this->getCols() != this->getRows()) {
-		    throw DimensionMismatch(*this);
-	    }
+            throw DimensionMismatch(*this);
+        }
 
         if (this->det() == 0.0) {
             throw SingularMatrix();
         }
 
         return this->adj() * (1.0 / this->det());;
+    }
+
+    // Secondary functions for Det
+    Matrix deleteRowAndColFromMatrix(const Matrix& matrix, size_t indRow, size_t indCol) {
+        Matrix temp_matrix(matrix.getRows() - 1, matrix.getCols() - 1);
+
+        size_t ki = 0;
+
+        for (size_t i = 0; i < matrix.getCols(); i++) {
+            if (i != indRow) {
+                for (size_t j = 0, kj = 0; j < matrix.getCols(); j++) {
+                    if (j != indCol) {
+                        temp_matrix(ki, kj) = matrix(i, j);
+                        kj++;
+                    }
+                }
+                ki++;
+            }
+        }
+        return temp_matrix;
+    }
+
+    double findDet(const Matrix& matrix, size_t n) {
+        if (n == 1) {
+            return matrix(0, 0);
+        }
+        if (n == 2) {
+            return matrix(0, 0) * matrix(1, 1) - matrix(0, 1) * matrix(1, 0);
+        }
+
+        double det = 0;
+        for (size_t k = 0; k < n; k++) {
+            Matrix newMatrix(n - 1, n - 1);
+            for (size_t i = 1; i < n; i++) {
+                size_t t = 0;
+                for (size_t j = 0; j < n; j++) {
+                    if (j != k) {
+                        newMatrix(i - 1, t) = matrix(i, j);
+                        t++;
+                    }
+                }
+            }
+            det += pow(-1.0, k + 2) * matrix(0, k) * findDet(newMatrix, n - 1);
+        }
+        return det;
     }
 }  // namespace prep
