@@ -1,453 +1,537 @@
 #pragma once // NOLINT
 #include <iterator>
+#include <iostream>
 
 namespace task {
-
-template <class T> class list {
+template<class T> class list {
  public:
-        class iterator {
-         public:
-            using difference_type = ptrdiff_t;
-            using value_type = T;
-            using pointer = T*;
-            using reference = T&;
-            using iterator_category = std::bidirectional_iterator_tag;
+    struct Node {
+        T val{ 0 };
+        Node* next{ nullptr };
+        Node* prev{ nullptr };
+    };
 
-            // constructors
-            iterator() : memberPtr(0) {}
-            iterator(pointer ptr) : memberPtr(ptr) {}
-            iterator(const iterator& other) { memberPtr = other.memberPtr; }
+    class const_iterator {
+     public:
+        using difference_type = ptrdiff_t;
+        using value_type = const T;
+        using pointer = const T*;
+        using reference = const T&;
+        using iterator_category = std::bidirectional_iterator_tag;
 
-            // operators
-            iterator& operator=(const iterator& other) { memberPtr = other.memberPtr; return *this; }
+        const_iterator(Node* node) : ptr(node) {}
+        const_iterator(const const_iterator& other) : ptr(other.ptr) {}
 
-            iterator& operator++() { memberPtr++; return *this; }
-            iterator operator++(int) const { iterator tmp = *this; ++(*this); return tmp; }
+        const_iterator& operator=(const const_iterator& other) { ptr = other.ptr; return *this; }
 
-            reference operator*() const { return *memberPtr; }
-            pointer operator->() const { return memberPtr; }
+        const_iterator& operator++() { ptr = ptr->next; return *this; }
+        const_iterator operator++(int) { const_iterator temp(*this); ++(*this); return temp; }
 
-            iterator& operator--() { memberPtr--; return *this; }
-            iterator operator--(int) const { iterator tmp = *this; --(*this); return tmp; }
+        reference operator*() const { return ptr->val; }
+        pointer operator->() const { return &ptr->val; }
 
-            bool operator==(iterator other) const { return this->memberPtr == other.memberPtr; }
-            bool operator!=(iterator other) const { return this->memberPtr != other.memberPtr; }
+        const_iterator& operator--() { ptr = ptr->prev; return *this; }
+        const_iterator operator--(int) { const_iterator temp(*this); --(*this); return temp; }
 
-         private:
-            pointer memberPtr;
-        };
+        bool operator==(const_iterator other) const { return ptr == other.ptr; }
+        bool operator!=(const_iterator other) const { return ptr != other.ptr; }
 
-        class const_iterator {
-         public:
-            using difference_type = ptrdiff_t;
-            using value_type = const T;
-            using pointer = const T*;
-            using reference = const T&;
-            using iterator_category = std::bidirectional_iterator_tag;
+     private:
+        Node* ptr;
+    };
 
-            // constructors
-            const_iterator() : memberPtr(0) {}
-            const_iterator(pointer ptr) : memberPtr(ptr) {}
-            const_iterator(const const_iterator& other) { memberPtr = other.memberPtr; }
+    class iterator {
+     public:
+        using difference_type = ptrdiff_t;
+        using value_type = T;
+        using pointer = T*;
+        using reference = T&;
+        using iterator_category = std::bidirectional_iterator_tag;
 
-            // operators
-            const_iterator& operator=(const const_iterator& other) {
-               memberPtr = other.memberPtr;
-               return *this; }
+        iterator(Node* node) : ptr(node) {}
+        iterator(const iterator& other) : ptr(other.ptr) {}
 
-            const_iterator& operator++() { memberPtr++; return *this; }
-            const_iterator operator++(int) const { const_iterator tmp = *this; ++(*this); return tmp; }
+        operator const_iterator() const { return const_iterator(ptr); }
 
-            reference operator*() const { return *memberPtr; }
-            pointer operator->() const { return memberPtr; }
+        iterator& operator=(const iterator& other) { ptr = other.ptr; return *this; }
 
-            const_iterator& operator--() { memberPtr--; return *this; }
-            const_iterator operator--(int) const { const_iterator tmp = *this; --(*this); return tmp; }
+        iterator& operator++() { ptr = ptr->next; return *this; }
+        iterator operator++(int) { iterator temp(*this); ++(*this); return temp; }
 
-            bool operator==(const const_iterator other) const { return this->memberPtr == other.memberPtr; }
-            bool operator!=(const const_iterator other) const { return this->memberPtr != other.memberPtr; }
+        reference operator*() const { return ptr->val; }
+        pointer operator->() const { return &ptr->val; }
 
-         private:
-            pointer memberPtr;
-        };
+        iterator& operator--() { ptr = ptr->prev; return *this; }
+        iterator operator--(int) { iterator temp(*this); --(*this); return temp; }
 
-        using reverse_iterator = std::reverse_iterator<iterator>;
-        using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+        bool operator==(iterator other) const { return ptr == other.ptr; }
+        bool operator!=(iterator other) const { return ptr != other.ptr; }
 
-        list(): element(0), len(0) {}
+     private:
+        Node* ptr;
+    };
 
-        list(size_t count, const T& value) {
-            this->len = count;
-            this->element = new T[this->len];
-            for (size_t i = 0; i < this->len; i++) {
-                this->element[i] = value;
-            }
+    using reverse_iterator = std::reverse_iterator<iterator>;
+    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
+
+    list() : head(nullptr), tail(nullptr), len(0) {}
+
+    list(size_t count, const T& value) {
+        Node* ptr = new Node;
+        ptr->prev = ptr->next = nullptr;
+        ptr->val = value;
+        head = ptr;
+        len++;
+        while (size() != count) {
+            Node* temp = new Node;
+            temp->next = nullptr;
+            temp->prev = ptr;
+            temp->val = value;
+            ptr->next = temp;
+            ptr = ptr->next;
+
+            len++;
         }
 
-        explicit list(size_t count) {
-            this->len = count;
-            this->element = new T[this->len];
+        tail = ptr;
+    }
+
+    explicit list(size_t count) {
+        Node* ptr = new Node;
+        ptr->prev = ptr->next = nullptr;
+        ptr->val = T();
+        head = ptr;
+        len++;
+
+        while (size() != count) {
+            Node* temp = new Node;
+            temp->next = nullptr;
+            temp->prev = ptr;
+            temp->val = T();
+            ptr->next = temp;
+            ptr = ptr->next;
+
+            len++;
         }
 
-        list(const list& other) {
-            this->~list();
+        tail = ptr;
+    }
 
-            this->len = other.len;
-            this->element = new T[this->len];
-            for (size_t i = 0; i < this->len; i++) {
-                this->element[i] = other.element[i];
-            }
+    ~list() {
+        clear();
+    }
+
+    list(const list& other) {
+        if (other.empty()) {
+            head = tail = nullptr;
+            return;
         }
 
-        ~list() {
-            delete[] this->element;
-            this->element = nullptr;
-            this->len = 0;
-        }
+        *this = other;
+    }
 
-        list& operator=(const list& other) {
-            if (!this->empty()) {
-                this->~list();
-            }
-
-            this->len = other.len;
-            this->element = new T[this->len];
-            for (size_t i = 0; i < this->len; i++) {
-                this->element[i] = other.element[i];
-            }
+    list& operator=(const list& other) {
+        if (other.empty()) {
+            head = tail = nullptr;
             return *this;
         }
 
-        T& front() {
-            if (this->empty()) {
-                throw this->empty();
-            }
-
-            iterator front = this->begin();
-            return *front;
-        }
-        const T& front() const {
-            if (this->empty()) {
-                throw this->empty();
-            }
-
-            const_iterator front = this->cbegin();
-            return *front;
+        if (!empty()) {
+            clear();
         }
 
-        T& back() {
-            if (this->empty()) {
-                throw this->empty();
-            }
+        Node* ptr = other.head;
+        Node* cur = new Node;
+        cur->val = ptr->val;
+        cur->prev = cur->next = nullptr;
+        head = cur;
+        ptr = ptr->next;
 
-            iterator back = this->end();
-            return *back;
-        }
-        const T& back() const {
-            if (this->empty()) {
-                throw this->empty();
-            }
-
-            const_iterator back = this->cend();
-            return *back;
-        }
-
-        iterator begin() const { return iterator(element); }
-        iterator end() const { return iterator(element + len); }
-
-        const_iterator cbegin() const { return const_iterator(element); }
-        const_iterator cend() const { return const_iterator(element + len); }
-
-        reverse_iterator rbegin() const { return reverse_iterator(element + len); }
-        reverse_iterator rend() const { return reverse_iterator(element); }
-
-        const_reverse_iterator crbegin() const { return const_reverse_iterator(element + len); }
-        const_reverse_iterator crend() const { return const_reverse_iterator(element); }
-
-
-        bool empty() const {
-            if (this->element == nullptr) {
-                return true;
-            }
-            return false;
+        while (ptr != nullptr) {
+            Node* temp = new Node;
+            temp->val = ptr->val;
+            temp->next = nullptr;
+            temp->prev = cur;
+            cur->next = temp;
+            cur = temp;
+            ptr = ptr->next;
         }
 
-        size_t size() const {
-            return this->len;
-        }
+        tail = cur;
+        len = other.size();
 
-        size_t max_size() const {
-            size_t maxLen = 0;
-            for (iterator it = this->begin(); it != this->end(); ++it) {
-                maxLen++;
-            }
-            return maxLen;
-        }
+        return *this;
+    }
 
-        void clear() {
-            if (this->empty()) {
-                return;
-            }
-            this->~list();
-        }
+    T& front() { return *iterator(head); }
+    const T& front() const { return *const_iterator(head); }
 
-        iterator insert(const_iterator pos, const T& value) {
-            if (std::distance(this->cbegin(), this->cend()) <= std::distance(this->cbegin(), pos)) {
-                throw pos;
-            }
+    T& back() { return *iterator(tail); }
+    const T& back() const { return *const_iterator(tail); }
 
-            int counter = std::distance(this->cbegin(), pos);
+    iterator begin() const { return iterator(head); }
+    iterator end() const { return ++iterator(tail); }
 
-            list newList;
-            iterator it = this->begin();
-            for (; it != std::next(this->begin(), counter); ++it) {
-                newList.push_back(*it);
-            }
-            newList.push_back(value);
-            iterator where = it;
-            for (; it != this->end(); ++it) {
-                newList.push_back(*it);
-            }
-            *this = newList;
-            return where;
-        }
+    const_iterator cbegin() const { return const_iterator(head); }
+    const_iterator cend() const { return ++const_iterator(tail); }
 
-        iterator insert(const_iterator pos, size_t count, const T& value) {
-            if (std::distance(this->cbegin(), this->cend()) <= std::distance(this->cbegin(), pos)) {
-                throw pos;
-            }
+    reverse_iterator rbegin() const { return ++reverse_iterator(tail); }
+    reverse_iterator rend() const { return reverse_iterator(head); }
 
-            int counter = std::distance(this->cbegin(), pos);
+    const_reverse_iterator crbegin() const { return const_reverse_iterator(tail); }
+    const_reverse_iterator crend() const { return const_reverse_iterator(head); }
 
-            list newList;
-            iterator it = this->begin();
-            for (; it != std::next(this->begin(), counter); ++it) {
-                newList.push_back(*it);
-            }
+    bool empty() const { return len == 0; }
 
-            iterator where = it;
-            for (size_t i = 0; i != count; i++) {
-                newList.push_back(value);
-            }
+    size_t size() const { return len; }
 
-            for (; it != this->end(); ++it) {
-                newList.push_back(*it);
-            }
+    size_t max_size() const {
+        iterator it = begin();
+        size_t count = 0;
 
-            *this = newList;
-            return where;
-        }
-
-        iterator erase(const_iterator pos) {
-            if (std::distance(this->cbegin(), this->cend()) <= std::distance(this->cbegin(), pos)) {
-                return this->end();
-            }
-
-            int counter = std::distance(this->cbegin(), pos);
-
-            list newList;
-            iterator it = this->begin();
-            for (; it != std::next(this->begin(), counter); ++it) {
-                newList.push_back(*it);
-            }
+        while (it != end()) {
             it = std::next(it, 1);
+            count++;
+        }
+        return count;
+    }
 
-            for (; it != this->end(); ++it) {
-                newList.push_back(*it);
-            }
+    void clear() {
+        Node* cur = head;
 
-            *this = newList;
-            return this->begin();
+        while (cur) {
+            Node* nxt = cur->next;
+            delete cur;
+            cur = nxt;
         }
 
-        iterator erase(const_iterator first, const_iterator last) {
-            if (std::distance(this->cbegin(), first) > std::distance(this->cbegin(), last)) {
-                throw;
-            }
+        head = tail = nullptr;
+        len = 0;
+    }
 
-            if (std::distance(this->cbegin(), this->cend()) <= std::distance(this->cbegin(), last) ||
-                std::distance(this->cbegin(), this->cend()) <= std::distance(this->cbegin(), first)) {
-                return this->end();
-            }
+    iterator insert(const_iterator pos, const T& value) {
+        size_t index = std::distance(cbegin(), pos);
+        iterator it = std::next(begin(), index);
 
-            int counter = std::distance(this->cbegin(), first);
+        Node* cur = head;
 
-            list newList;
-            iterator it = this->begin();
-            for (; it != std::next(this->begin(), counter); ++it) {
-                newList.push_back(*it);
-            }
-
-            counter = std::distance(first, last);
-
-            it = std::next(it, counter);
-
-            for (; it != this->end(); ++it) {
-                newList.push_back(*it);
-            }
-
-            *this = newList;
-
-            return this->begin();
+        while (index--) {
+            cur = cur->next;
         }
 
-        void push_back(const T& value) {
-            list newList(this->size() + 1);
-            reverse_iterator newRBegin = newList.rbegin();
-            *newRBegin = value;
-            newRBegin = std::next(newRBegin, 1);
-            for (reverse_iterator rBegin = this->rbegin(); rBegin != this->rend(); ++rBegin, ++newRBegin) {
-                *newRBegin = *rBegin;
-            }
-            *this = newList;
+        if (cur == tail || cur == nullptr) {
+            this->push_back(value);
+            return it;
         }
 
-        void pop_back() {
-           if (this->empty()) {
-                    throw this->empty();
-           }
-
-            list newList;
-            for (iterator it = this->begin(); it != --this->end(); ++it) {
-                newList.push_back(*it);
-            }
-            *this = newList;
+        if (cur == head) {
+            this->push_front(value);
+            return it;
         }
 
-        void push_front(const T& value) {
-            list newList(this->size() + 1);
-            iterator newIt = newList.begin();
-            *newIt = value;
-            newIt = std::next(newIt, 1);
-            for (iterator it = this->begin(); it != this->end(); ++it, ++newIt) {
-                *newIt = *it;
-            }
-            *this = newList;
+        Node* newNode = new Node{ value, cur, cur->prev };
+        cur->prev->next = newNode;
+        cur->prev = newNode;
+        len++;
+        return it;
+    }
+    iterator insert(const_iterator pos, size_t count, const T& value) {
+        size_t index = std::distance(cbegin(), pos);
+        iterator it = std::next(begin(), index);
+
+        Node* cur = head;
+        while (index--) {
+            cur = cur->next;
         }
 
-        void pop_front() {
-            if (this->empty()) {
-                throw this->empty();
+        if (cur == tail || cur == nullptr) {
+            size_t k = 0;
+            while (k != count) {
+                this->push_back(value);
+                k++;
             }
-
-            list newList;
-            for (iterator it = std::next(this->begin(), 1); it != this->end(); ++it) {
-                newList.push_back(*it);
-            }
-            *this = newList;
+            return it;
         }
 
-        void resize(size_t count) {
-            if (this->size() == count) {
-                return;
+        if (cur == head) {
+            size_t k = 0;
+            while (k != count) {
+                this->push_front(value);
+                k++;
             }
-            if (this->size() > count) {
-                while (this->size() != count) {
-                    this->pop_back();
-                }
-            }
-            if (this->size() < count) {
-                while (this->size() != count) {
-                    this->push_back(0);
-                }
-            }
+            return it;
         }
 
-        void swap(list& other) {
-            list tempList(*this);
-            *this = other;
-            other = tempList;
+        size_t k = 0;
+        while (k != count) {
+            insert(pos, value);
+            k++;
         }
 
-        void merge(list& other) {
-            reverse_iterator reverseBegin = this->rbegin();
-            size_t i = this->size();
-            while (i) {
-                other.push_front(*reverseBegin);
-                reverseBegin = std::next(reverseBegin, 1);
-                i--;
-            }
-            this->clear();
+        return it;
+    }
+
+    iterator erase(const_iterator pos) {
+        if (empty()) {
+            return begin();
         }
 
-        void splice(const_iterator pos, list& other) {
-            int counter = std::distance(this->cbegin(), pos);
-            iterator it = this->begin();
-            list newList;
-            for (; it != std::next(this->begin(), counter); ++it) {
-                newList.push_back(*it);
-            }
+        size_t index = std::distance(cbegin(), pos);
+        Node* cur = head;
 
-            iterator newIt = other.begin();
-            while (newIt != other.end()) {
-                newList.push_back(*newIt);
-                newIt = std::next(newIt, 1);
-            }
-            for (; it != this->end(); ++it) {
-                newList.push_back(*it);
-            }
-            *this = newList;
-            other.clear();
+        while (index--) {
+            cur = cur->next;
         }
 
-        void remove(const T& value) {
-            list newList;
-            iterator it = this->begin();
-            for (; it != this->end(); ++it) {
-                if (*it != value) {
-                    newList.push_back(*it);
-                }
-            }
-            *this = newList;
+        if (cur == tail || cur == nullptr) {
+            pop_back();
+            return begin();
+        }
+        if (cur == head) {
+            pop_front();
+            return begin();
+        }
+        cur->prev->next = cur->next;
+        cur->next->prev = cur->prev;
+        len--;
+        delete cur;
+
+        return begin();
+    }
+    iterator erase(const_iterator first, const_iterator last) {
+        if (empty()) {
+            return begin();
+        }
+        size_t delIndex = std::distance(first, last);
+        size_t index = std::distance(cbegin(), first);
+        Node* cur = head;
+
+        while (index--) {
+            cur = cur->next;
         }
 
-        void reverse() {
-            iterator beginIt = this->begin();
-            iterator endIt = std::prev(this->end(), 1);
-            for (size_t i = 0, j = this->size(); i < this->size() / 2; i++, j--, ++beginIt, --endIt) {
-                T temp = *beginIt;
-                *beginIt = *endIt;
-                *endIt = temp;
+        if (cur == tail || cur == nullptr) {
+            size_t k = 0;
+            while (k != delIndex) {
+                pop_back();
+                k++;
             }
+            return begin();
         }
 
-        void unique() {
-            list newList;
-            iterator it = this->begin();
-            for (; it != this->end();) {
-                if (*it != *(std::next(it, 1))) {
-                    newList.push_back(*it);
-                    it = std::next(it, 1);
+        if (cur == head) {
+            size_t k = 0;
+            while (k != delIndex) {
+                pop_front();
+                k++;
+            }
+            return begin();
+        }
+
+        size_t k = 0;
+        while (k != delIndex) {
+            erase(first);
+        }
+        return begin();
+    }
+
+    void push_back(const T& value) {
+        if (empty()) {
+            Node* ptr = new Node;
+            ptr->val = value;
+            ptr->next = ptr->prev = nullptr;
+            head = tail = ptr;
+            len++;
+            return;
+        }
+
+        Node* ptr = new Node;
+        ptr->val = value;
+        ptr->next = nullptr;
+        ptr->prev = tail;
+        tail->next = ptr;
+        tail = ptr;
+        len++;
+    }
+    void pop_back() {
+        if (empty()) {
+            return;
+        }
+
+        Node* newTail = tail->prev;
+
+        delete tail;
+
+        if (newTail) {
+            newTail->next = nullptr;
+        } else {
+            head = nullptr;
+        }
+
+        tail = newTail;
+        len--;
+    }
+
+    void push_front(const T& value) {
+        if (empty()) {
+            Node* ptr = new Node;
+            ptr->val = value;
+            ptr->next = ptr->prev = nullptr;
+            head = tail = ptr;
+            len++;
+            return;
+        }
+
+        Node* ptr = new Node;
+        ptr->val = value;
+        ptr->next = head;
+        ptr->prev = nullptr;
+        head->prev = ptr;
+        head = ptr;
+        len++;
+    }
+    void pop_front() {
+        if (empty()) {
+            return;
+        }
+
+        Node* newHead = head->next;
+
+        delete head;
+
+        if (newHead) {
+            newHead->prev = nullptr;
+        } else {
+            tail = nullptr;
+        }
+
+        head = newHead;
+        --len;
+    }
+
+    void resize(size_t count) {
+        if (size() > count) {
+            while (size() != count) {
+                pop_back();
+            }
+        }
+        if (size() < count) {
+            while (size() != count) {
+                if (!size()) {
+                    Node* ptr = new Node;
+                    ptr->val = T();
+                    ptr->next = ptr->prev = nullptr;
+                    head = tail = ptr;
+                    len++;
                     continue;
                 }
-                newList.push_back(*it);
-                it = std::next(it, 2);
+                Node* ptr = new Node;
+                ptr->val = T();
+                ptr->next = nullptr;
+                ptr->prev = tail;
+                tail->next = ptr;
+                tail = ptr;
+                len++;
             }
-            *this = newList;
+        }
+    }
+    void swap(list& other) {
+        std::swap(head, other.head);
+        std::swap(tail, other.tail);
+        std::swap(len, other.len);
+    }
+
+    void merge(list& other) {
+        if (other.empty()) {
+            return;
         }
 
-        void sort() {
-            for (size_t i = 0; i < this->size(); i++) {
-                iterator it = this->begin();
-                iterator itt = std::next(it, 1);
-                for (; it != std::prev(this->end(), 1);) {
-                    if (*it > *itt) {
-                        T temp = *it;
-                        *it = *itt;
-                        *itt = temp;
-                        it = std::next(it, 1);
-                        itt = std::next(itt, 1);
-                        continue;
-                    }
+        iterator it = other.begin();
+        while (it != other.end()) {
+            push_back(*it);
+            it = std::next(it, 1);
+        }
+        sort();
+        other.clear();
+    }
+    void splice(const_iterator pos, list& other) {
+        if (other.empty()) {
+            return;
+        }
+
+        iterator it = other.begin();
+        while (it != other.end()) {
+            insert(pos, *it);
+            it = std::next(it, 1);
+        }
+        other.clear();
+    }
+    void remove(const T& value) {
+        if (empty()) {
+            return;
+        }
+
+        for (const_iterator it = cbegin(); it != cend(); ) {
+            if (*it == value) {
+                const_iterator itt = std::next(it, 1);
+                erase(it);
+                it = itt;
+                continue;
+            }
+            it = std::next(it, 1);
+        }
+    }
+    void reverse() {
+        if (empty()) {
+            return;
+        }
+
+        iterator it = begin();
+        iterator itt(tail);
+        for (size_t i = 0, j = size(); i < size() / 2; i++, j--, ++it, --itt) {
+            T temp = *it;
+            *it = *itt;
+            *itt = temp;
+        }
+    }
+    void unique() {
+        if (empty()) {
+            return;
+        }
+
+        for (const_iterator it = cbegin(), last(tail); it != last; ) {
+            const_iterator itt = std::next(it, 1);
+            if (*it == *itt) {
+                erase(it);
+                it = itt;
+                continue;
+            }
+            it = std::next(it, 1);
+        }
+    }
+    void sort() {
+        for (size_t i = 0; i < size(); i++) {
+            iterator it = begin();
+            iterator itt = std::next(it, 1);
+            iterator last(tail);
+            for (; it != last;) {
+                if (*it > *itt) {
+                    T temp = *it;
+                    *it = *itt;
+                    *itt = temp;
                     it = std::next(it, 1);
                     itt = std::next(itt, 1);
+                    continue;
                 }
+                it = std::next(it, 1);
+                itt = std::next(itt, 1);
             }
         }
+    }
 
  private:
-      T* element;
-      size_t len;
+    Node* head{ nullptr };
+    Node* tail{ nullptr };
+    size_t len{ 0 };
 };
-
 }  // namespace task

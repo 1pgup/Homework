@@ -12,7 +12,7 @@ static constexpr int kRandomSeed = 1234567890;
 size_t RandomUInt(size_t max = -1) {
     static std::mt19937 rand(kRandomSeed);
 
-    std::uniform_int_distribution<size_t> dist{0, max};
+    std::uniform_int_distribution<size_t> dist{ 0, max };
     return dist(rand);
 }
 
@@ -35,7 +35,7 @@ void RandomFill(T& container, size_t count, size_t max = -1) {
 
 void FailWithMsg(const std::string& msg, int line) {
     std::cerr << "Test failed!\n";
-    std::cerr << "[Line " << line << "] "  << msg << std::endl;
+    std::cerr << "[Line " << line << "] " << msg << std::endl;
     std::exit(EXIT_FAILURE);
 }
 
@@ -56,10 +56,10 @@ int main() {
         task::list<int> list;
         list.push_back(42);
         ASSERT_TRUE(list.size() == 1)
-        list.push_back(2);
+            list.push_back(2);
         list.pop_front();
         ASSERT_TRUE(list.front() == 2)
-        list.pop_back();
+            list.pop_back();
         ASSERT_TRUE(list.empty())
     }
 
@@ -68,20 +68,20 @@ int main() {
         task::list<std::string> list;
         list.push_front("test");
         ASSERT_TRUE(!list.empty())
-        list.push_front("test2");
+            list.push_front("test2");
         ASSERT_TRUE(list.back() == "test")
-        list.clear();
+            list.clear();
         list.clear();
         ASSERT_TRUE(list.size() == 0)
-        list.resize(10);
+            list.resize(10);
         ASSERT_TRUE(list.size() == 10)
-        ASSERT_TRUE(list.back() == "")
+            ASSERT_TRUE(list.back() == "")
     }
 
     {
         const task::list<int> list(5);
         ASSERT_TRUE(list.front() == int())
-        ASSERT_TRUE(list.back() == int())
+            ASSERT_TRUE(list.back() == int())
     }
 
     {
@@ -89,7 +89,7 @@ int main() {
         std::list<size_t> list_std(10, 30);
         ASSERT_EQUAL_MSG(list_task, list_std, "Count-value constructor")
 
-        list_task.insert(list_task.begin(), 20);
+            list_task.insert(list_task.begin(), 20);
         list_std.insert(list_std.begin(), 20);
 
         list_task.insert(list_task.end(), 10, 20);
@@ -97,7 +97,7 @@ int main() {
 
         ASSERT_EQUAL_MSG(list_task, list_std, "list::insert")
 
-        list_task.erase(list_task.begin(), std::next(list_task.begin(), 5));
+            list_task.erase(list_task.begin(), std::next(list_task.begin(), 5));
         list_std.erase(list_std.begin(), std::next(list_std.begin(), 5));
 
         list_task.erase(std::prev(list_task.end(), 5), list_task.end());
@@ -113,23 +113,23 @@ int main() {
         list.sort();
         ASSERT_TRUE(std::is_sorted(list.begin(), list.end()))
 
-        task::list<size_t> list2 = list;
+            task::list<size_t> list2 = list;
         ASSERT_EQUAL_MSG(list, list2, "Copy constructor")
 
-        list2.resize(0);
+            list2.resize(0);
         for (auto it = list.crbegin(); it != list.crend(); ++it) {
             list2.push_back(*it);
         }
         list.reverse();
         ASSERT_EQUAL_MSG(list, list2, "list::reverse / const reverse iterator")
 
-        std::reverse(list.begin(), list.end());
+            std::reverse(list.begin(), list.end());
         list2.reverse();
 
         ASSERT_EQUAL_MSG(list, list2, "std::reverse")
-        ASSERT_TRUE(std::is_sorted(list.begin(), list.end()))
+            ASSERT_TRUE(std::is_sorted(list.begin(), list.end()))
 
-        task::list<size_t> list3(10);
+            task::list<size_t> list3(10);
         list = list2 = list3;
         ASSERT_EQUAL_MSG(list, list3, "Assignment operator")
     }
@@ -146,17 +146,17 @@ int main() {
 
         ASSERT_EQUAL_MSG(list_task, list_std, "std::copy")
 
-        list_task.sort();
+            list_task.sort();
         list_std.sort();
 
         ASSERT_EQUAL_MSG(list_task, list_std, "list::sort")
 
-        list_task.unique();
+            list_task.unique();
         list_std.unique();
 
         ASSERT_EQUAL_MSG(list_task, list_std, "list::unique")
 
-        task::list<size_t> list_task2;
+            task::list<size_t> list_task2;
         std::list<size_t> list_std2;
 
         RandomFill(list_std2, RandomUInt(100, 500), 100);
@@ -181,7 +181,7 @@ int main() {
 
             ASSERT_EQUAL_MSG(list_task, list_std, "list::splice")
 
-            list_task2 = list_task_temp;
+                list_task2 = list_task_temp;
             list_std2 = list_std_temp;
             list_task_temp.clear();
             list_std_temp.clear();
@@ -194,7 +194,7 @@ int main() {
 
         ASSERT_EQUAL_MSG(list_task, list_std, "list::remove")
 
-        list_task.sort();
+            list_task.sort();
         list_std.sort();
         list_task2.sort();
         list_std2.sort();
@@ -205,15 +205,15 @@ int main() {
         ASSERT_EQUAL_MSG(list_task2, list_std2, "list::swap")
 
         {
-            auto &element_reference = list_task2.front();
+            auto& element_reference = list_task2.front();
 
             list_task.merge(list_task2);
             list_std.merge(list_std2);
 
             ASSERT_EQUAL_MSG(list_task, list_std, "list::merge")
-            ASSERT_EQUAL_MSG(list_task2, list_std2, "list::merge")
+                ASSERT_EQUAL_MSG(list_task2, list_std2, "list::merge")
 
-            element_reference = 1000;
+                element_reference = 1000;
 
             ASSERT_TRUE_MSG(std::find(list_task.begin(), list_task.end(), 1000) != list_task.end(), "list::merge")
         }
@@ -237,19 +237,22 @@ int main() {
                         if (TossCoin()) {
                             lists_task[list].push_back(val);
                             lists_std[list].push_back(val);
-                        } else {
+                        }
+                        else {
                             lists_task[list].push_front(val);
                             lists_std[list].push_front(val);
                         }
                     }
-                } else {
+                }
+                else {
                     // Random Pop
                     size_t count = RandomUInt(0, lists_task[list].size());
                     for (; count; --count) {
                         if (TossCoin()) {
                             lists_task[list].pop_back();
                             lists_std[list].pop_back();
-                        } else {
+                        }
+                        else {
                             lists_task[list].pop_front();
                             lists_std[list].pop_front();
                         }
@@ -257,20 +260,20 @@ int main() {
                 }
 
                 switch (RandomUInt(4)) {
-                    case 0:
-                        if (!lists_std[list].empty()) {
-                            lists_task[list].remove(lists_task[list].back());
-                            lists_std[list].remove(lists_std[list].back());
-                        }
-                        break;
-                    case 1:
-                        lists_task[list].reverse();
-                        lists_std[list].reverse();
-                        break;
-                    case 2:
-                        lists_task[list].sort();
-                        lists_std[list].sort();
-                        break;
+                case 0:
+                    if (!lists_std[list].empty()) {
+                        lists_task[list].remove(lists_task[list].back());
+                        lists_std[list].remove(lists_std[list].back());
+                    }
+                    break;
+                case 1:
+                    lists_task[list].reverse();
+                    lists_std[list].reverse();
+                    break;
+                case 2:
+                    lists_task[list].sort();
+                    lists_std[list].sort();
+                    break;
                 }
 
                 ASSERT_EQUAL_MSG(lists_task[list], lists_std[list], "Stress test")
