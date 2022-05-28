@@ -336,7 +336,7 @@ template<class T> class list {
 
             cur->prev->next = cur->next;
             cur->next->prev = cur->prev;
- 
+
             delete cur;
 
             len--;
