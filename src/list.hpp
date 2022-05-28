@@ -316,7 +316,12 @@ template<class T> class list {
                 return begin();
             }
 
-            size_t index = std::distance(cbegin(), pos);
+            const_iterator temp = pos;
+            if (pos == cend()) {
+                temp = std::prev(temp, 1);
+            }
+
+            size_t index = std::distance(cbegin(), temp);
             Node* cur = head;
 
             while (index--) {
@@ -361,11 +366,7 @@ template<class T> class list {
             }
 
             if (cur == tail) {
-                size_t k = 0;
-                while (k != delIndex) {
-                    pop_back();
-                    k++;
-                }
+                pop_back();
                 return begin();
             }
 
@@ -378,44 +379,54 @@ template<class T> class list {
                 return begin();
             }
 
-            size_t k = 0;
             const_iterator it = first;
-            while (k != delIndex) {
-                if (it == --cend()) {
-                    erase(it);
-                    k++;
-                } else {
-                    const_iterator itt = std::next(it, 1);
-                    erase(it);
-                    it = itt;
-                    k++;
-                }
+            while (it != last) {
+                const_iterator itt = std::next(it, 1);
+                erase(it);
+                it = itt;
             }
             return begin();
         }
 
     void push_back(const T& value) {
-            if (empty()) {
-                Node* guard = new Node;
-                Node* ptr = new Node;
-                guard->prev = ptr;
-                ptr->val = value;
-                ptr->prev = nullptr;
-                ptr->next = guard;
-                head = tail = ptr;
-                len++;
-                return;
-            }
+        if (empty()) {
             Node* guard = new Node;
             Node* ptr = new Node;
             guard->prev = ptr;
             ptr->val = value;
-            ptr->next = guard;
-            ptr->prev = tail;
-            tail->next = ptr;
-            tail = ptr;
+            ptr->prev = nullptr;
+            ptr->next = nullptr;
+            head = tail = ptr;
+            tail->next = guard;
+            guard->prev = tail;
+            guard->next = nullptr;
             len++;
+            return;
         }
+        if (head == tail) {
+            delete tail->next;
+            Node* ptr = new Node;
+            ptr->val = value;
+            ptr->next = nullptr;
+            ptr->prev = head;
+            tail = ptr;
+            head->next = tail;
+            Node* guard = new Node;
+            guard->prev = tail;
+            tail->next = guard;
+            len++;
+            return;
+        }
+        Node* ptr = new Node;
+        ptr->val = value;
+        ptr->next = tail->next;
+        ptr->prev = tail;
+        tail->next = ptr;
+        tail = ptr;
+        len++;
+        head->prev = nullptr;
+        tail->next->prev = tail;
+    }
     void pop_back() {
             if (empty()) {
                 return;
@@ -425,13 +436,11 @@ template<class T> class list {
                 return;
             }
 
-            Node* guard = new Node;
             Node* newTail = tail->prev;
-            guard->prev = newTail;
+            tail->next->prev = newTail;
+            newTail->next = tail->next;
 
             delete tail;
-
-           newTail->next = guard;
 
             tail = newTail;
             len--;
@@ -449,7 +458,6 @@ template<class T> class list {
                 len++;
                 return;
             }
-
             Node* ptr = new Node;
             ptr->val = value;
             ptr->next = head;
@@ -485,26 +493,7 @@ template<class T> class list {
             }
             if (size() < count) {
                 while (size() != count) {
-                    if (!size()) {
-                        Node* guard = new Node;
-                        Node* ptr = new Node;
-                        guard->prev = ptr;
-                        ptr->val = T();
-                        ptr->prev = nullptr;
-                        ptr->next = guard;
-                        head = tail = ptr;
-                        len++;
-                        continue;
-                    }
-                    Node* guard = new Node;
-                    Node* ptr = new Node;
-                    guard->prev = ptr;
-                    ptr->val = T();
-                    ptr->next = guard;
-                    ptr->prev = tail;
-                    tail->next = ptr;
-                    tail = ptr;
-                    len++;
+                    push_back(T());
                 }
             }
         }
@@ -606,7 +595,7 @@ template<class T> class list {
                 return;
             }
 
-            for (const_iterator it = cbegin(), last = --end(); it != last; ) {
+            for (const_iterator it = cbegin(); it != --cend(); ) {
                 const_iterator itt = std::next(it, 1);
                 if (*it == *itt) {
                     erase(it);
