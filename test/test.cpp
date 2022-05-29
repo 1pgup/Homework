@@ -12,7 +12,7 @@ static constexpr int kRandomSeed = 1234567890;
 size_t RandomUInt(size_t max = -1) {
     static std::mt19937 rand(kRandomSeed);
 
-    std::uniform_int_distribution<size_t> dist{0, max};
+    std::uniform_int_distribution<size_t> dist{ 0, max };
     return dist(rand);
 }
 
@@ -35,7 +35,7 @@ void RandomFill(T& container, size_t count, size_t max = -1) {
 
 void FailWithMsg(const std::string& msg, int line) {
     std::cerr << "Test failed!\n";
-    std::cerr << "[Line " << line << "] "  << msg << std::endl;
+    std::cerr << "[Line " << line << "] " << msg << std::endl;
     std::exit(EXIT_FAILURE);
 }
 
@@ -205,7 +205,7 @@ int main() {
         ASSERT_EQUAL_MSG(list_task2, list_std2, "list::swap")
 
         {
-            auto &element_reference = list_task2.front();
+            auto& element_reference = list_task2.front();
 
             list_task.merge(list_task2);
             list_std.merge(list_std2);
@@ -237,19 +237,22 @@ int main() {
                         if (TossCoin()) {
                             lists_task[list].push_back(val);
                             lists_std[list].push_back(val);
-                        } else {
+                        }
+                        else {
                             lists_task[list].push_front(val);
                             lists_std[list].push_front(val);
                         }
                     }
-                } else {
+                }
+                else {
                     // Random Pop
                     size_t count = RandomUInt(0, lists_task[list].size());
                     for (; count; --count) {
                         if (TossCoin()) {
                             lists_task[list].pop_back();
                             lists_std[list].pop_back();
-                        } else {
+                        }
+                        else {
                             lists_task[list].pop_front();
                             lists_std[list].pop_front();
                         }
@@ -257,20 +260,20 @@ int main() {
                 }
 
                 switch (RandomUInt(4)) {
-                    case 0:
-                        if (!lists_std[list].empty()) {
-                            lists_task[list].remove(lists_task[list].back());
-                            lists_std[list].remove(lists_std[list].back());
-                        }
-                        break;
-                    case 1:
-                        lists_task[list].reverse();
-                        lists_std[list].reverse();
-                        break;
-                    case 2:
-                        lists_task[list].sort();
-                        lists_std[list].sort();
-                        break;
+                case 0:
+                    if (!lists_std[list].empty()) {
+                        lists_task[list].remove(lists_task[list].back());
+                        lists_std[list].remove(lists_std[list].back());
+                    }
+                    break;
+                case 1:
+                    lists_task[list].reverse();
+                    lists_std[list].reverse();
+                    break;
+                case 2:
+                    lists_task[list].sort();
+                    lists_std[list].sort();
+                    break;
                 }
 
                 ASSERT_EQUAL_MSG(lists_task[list], lists_std[list], "Stress test")
