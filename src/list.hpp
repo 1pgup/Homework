@@ -622,25 +622,61 @@ template<class T> class list {
             it = std::next(it, 1);
         }
     }
-    void sort() const {
+    void sort() {
+        if (empty()) {
+            return;
+        }
+
         for (size_t i = 0; i < size(); i++) {
-            iterator it = begin();
-            iterator itt = std::next(it, 1);
-            iterator last = --end();
-            for (; it != last;) {
-                if (*it > *itt) {
-                    T temp = *it;
-                    *it = *itt;
-                    *itt = temp;
-                    it = std::next(it, 1);
-                    itt = std::next(itt, 1);
+            Node* cur = head;
+            Node* nxt = cur->next;
+            while (cur != tail) {
+                if (cur->val > nxt->val) {
+                    swap_for_sort(cur, nxt);
+                    nxt = cur->next;
                     continue;
                 }
-                it = std::next(it, 1);
-                itt = std::next(itt, 1);
+                cur = cur->next;
+                nxt = cur->next;
             }
         }
     }
+
+ private:
+     void swap_for_sort(Node* first, Node* second) {
+         if (first == head) {
+             head = second;
+         } else if (second == head) {
+             head = first;
+         }
+
+         if (first == tail) {
+             tail = second;
+         } else if (second == tail) {
+             tail = first;
+         }
+
+         Node* temp;
+
+         temp = first->next;
+         first->next = second->next;
+         second->next = temp;
+
+         first->next->prev = first;
+         second->next->prev = second;
+
+         temp = first->prev;
+         first->prev = second->prev;
+         second->prev = temp;
+
+         if (first->prev != nullptr) {
+             first->prev->next = first;
+         }
+
+         if (second->prev != nullptr) {
+             second->prev->next = second;
+         }
+     }
 
  private:
      Node* head{ nullptr };
